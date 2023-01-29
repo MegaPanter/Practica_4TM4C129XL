@@ -1,47 +1,46 @@
 #include "lib/include.h"
 volatile uint16_t vdig[6];
 
-
 extern void Configurar_UART1(void)
 {
-    SYSCTL->RCGCUART  = (1<<1);   //Paso 1 (RCGCUART) pag.344 UART/modulo0 0->Disable 1->Enable
-    SYSCTL->RCGCGPIO |= (1<<1);     //Paso 2 (RCGCGPIO) pag.340 Enable clock port A
+    SYSCTL->RCGCUART  = (1<<0);   //Paso 1 (RCGCUART) pag.344 UART/modulo0 0->Disable 1->Enable
+    SYSCTL->RCGCGPIO |= (1<<5)|(1<<4)|(1<<3)|(0<<2)|(1<<1)|(1<<0)|(1<<12)|(1<<8);     //Paso 2 (RCGCGPIO) pag.340 Enable clock port A
     //(GPIOAFSEL) pag.671 Enable alternate function
-   
-            GPIOB_AHB->AFSEL = (1<<1) | (1<<0); //GPIO Port Control (GPIOPCTL) PA1-> U1Rx PB1-> U1Tx pag.688
-            GPIOB_AHB->DIR =(1<<1) | (0<<0);
-            //GPIO Port Control (GPIOPCTL) PA0-> U0Rx PA1-> U0Tx pag.688
-            GPIOB_AHB->PCTL = (GPIOB_AHB->PCTL&0xFFFFFF00) | 0x00000011;// (1<<0) | (1<<4);//0x00000011
-            // GPIO Digital Enable (GPIODEN) pag.682
-            GPIOB_AHB->DEN = (1<<0) | (1<<1);//PA1 PA0 //UART0 UART Control (UARTCTL) pag.918 DISABLE!!
-            GPIOB_AHB->AMSEL=0x00;
-    
-        UART1->CTL = (0<<9) | (0<<8) | (0<<0)| (0<<4);
+    GPIOA_AHB->AFSEL = (1<<1) | (1<<0);
+    //GPIO Port Control (GPIOPCTL) PA0-> U0Rx PA1-> U0Tx pag.688
+    GPIOA_AHB->PCTL = (GPIOA_AHB->PCTL&0xFFFFFF00) | 0x00000011;// (1<<0) | (1<<4);//0x00000011
+    // GPIO Digital Enable (GPIODEN) pag.682
+    GPIOA_AHB->DEN = (1<<0) | (1<<1);//PA1 PA0
+    //UART0 UART Control (UARTCTL) pag.918 DISABLE!!
+    UART0->CTL = (0<<9) | (0<<8) | (0<<0)| (0<<4);
 
     // UART Integer Baud-Rate Divisor (UARTIBRD) pag.914
     /*
-    BRD = 20,000,000 / (16 * 9600) = 130.2
-    UARTFBRD[DIVFRAC] = integer(0.2 * 64 + 0.5) = 14
+    BRD = 55,000,000 / (16 * 115200) = 29.83
+    UARTFBRD[DIVFRAC] = integer(0.83 * 64 + 0.5) = 54
     */
-        UART1->IBRD = 130;
+    UART0->IBRD = 29;
     // UART Fractional Baud-Rate Divisor (UARTFBRD) pag.915
-        UART1->FBRD = 14;
+    UART0->FBRD = 54;
     //  UART Line Control (UARTLCRH) pag.916
-        UART1->LCRH = (0x3<<5)|(1<<4);
+    UART0->LCRH = (0x3<<5)|(1<<4);
     //  UART Clock Configuration(UARTCC) pag.939
-  
-        UART1->CC =(0<<0);
+    UART0->CC =(0<<0);
     //Disable UART0 UART Control (UARTCTL) pag.918
-        UART1->CTL = (1<<0) | (1<<8) | (1<<9)| (1<<4);
+    UART0->CTL = (1<<0) | (1<<8) | (1<<9)  | (1<<4);
 
 
 
 }
+
+
+
+
 extern void trans_char(char c)
 { 
-     while((UART1->FR & (1<<5))!=0);
+     while((UART0->FR & (1<<5))!=0);
     {
-        UART1->DR=c;
+        UART0->DR=c;
     }
 }
 
@@ -103,4 +102,13 @@ extern void SysTick_1ms(uint16_t delay){
     SysTick->VAL = 0;
     SysTick->CTRL = (1<<2)|(1<<0);
     while((SysTick->CTRL&0x10000) == 0){}
+}
+extern void delayms(int i)
+{
+    int a,b;
+    for(a=0;a<i;a++)
+    for(b=0;b<3180;b++)
+    {}
+    
+
 }

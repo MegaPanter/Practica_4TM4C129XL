@@ -15,7 +15,7 @@ extern void Configura_Reg_ADC0(void)
     de procesador 
     */
      //Pag 396 para inicializar el modulo de reloj del adc RCGCADC
-    SYSCTL->RCGCADC = (1<<0); 
+    SYSCTL->RCGCADC = (1<<0)|(1<<1); 
     //Pag 382 (RGCGPIO) Puertos base habilitación del reloj
     //                     F     E      D       C      B     A
     SYSCTL->RCGCGPIO |= (1<<5)|(1<<4)|(1<<3)|(0<<2)|(1<<1)|(1<<0)|(1<<12)|(1<<8);
@@ -46,29 +46,61 @@ extern void Configura_Reg_ADC0(void)
     GPIOE_AHB->AMSEL= (1<<0) | (1<<2)| (1<<4);
     
     //Pag 1159 El registro (ADCPC) establece la velocidad de conversión por segundo
-    ADC0->PC = 0x1;//250ksps
+    ADC0->PC = 0x5;//250ksps
     //Pag 1099 Este registro (ADCSSPRI) configura la prioridad de los secuenciadores
     //PRIORIDAD ss3/ss2/ss1/ss0  mayor 0-----3 menor 
     ADC0->SSPRI = 0x3012;
     //Pag 1077 (ADCACTSS) Este registro controla la activación de los secuenciadores
     ADC0->ACTSS  =   (0<<3) | (0<<2) | (0<<1) | (0<<0);
     //Pag 1091 Este registro (ADCEMUX) selecciona el evento que activa la conversión (trigger)
-    ADC0->EMUX  = (0x0<<8)|(0x0<<4);
+    ADC0->EMUX  = (0x0<<8)|(0x0<<4)|(0x0<<0)|(0x0<<12);
     //Pag 1129 Este registro (ADCSSMUX2) define las entradas analógicas con el canal y secuenciador seleccionado
     
     
     
-    ADC0->SSMUX2 = (1<<0)|(3<<4)|(4<<8); 
+    ADC0->SSMUX2 = (1<<0); 
                            //pag 868 Este registro (ADCSSCTL2), configura el bit de control de muestreo y la interrupción
-    ADC0->SSMUX1 = (5<<0)|(11<<4)|(9<<8); 
-    ADC0->SSCTL2 = (1<<1) | (1<<2)| (1<<5) | (1<<6)|(1<<9) | (1<<10);
-    ADC0->SSCTL1 = (1<<1) | (1<<2)|(1<<5) | (1<<6)|(1<<9) | (1<<10);
+    ADC0->SSMUX1 = (5<<0); 
+    ADC0->SSMUX3 = (3<<0); 
+                           //pag 868 Este registro (ADCSSCTL2), configura el bit de control de muestreo y la interrupción
+    ADC0->SSMUX0 = (11<<0); 
+    ADC0->SSCTL2 = (1<<1) | (1<<2);
+    ADC0->SSCTL1 = (1<<1) | (1<<2);
+    ADC0->SSCTL3 = (1<<1) | (1<<2);
+    ADC0->SSCTL0 = (1<<1) | (1<<2);
     /* Enable ADC Interrupt */
-    ADC0->IM = (0<<2)|(0<<1); /* Unmask ADC0 sequence 2 interrupt pag 1082*/
+    ADC0->IM = (1<<2)|(1<<1)|(1<<3)|(1<<0); /* Unmask ADC0 sequence 2 interrupt pag 1082*/
     //NVIC->PRI4 = (NVICPRI4_R & 0xFFFFFF00) | 0x00000020;
     //NVIC->EN0 = 0x00010000;
     //Pag 1077 (ADCACTSS) Este registro controla la activación de los secuenciadores
-    ADC0->ACTSS = (0<<3) | (1<<2) | (1<<1) | (0<<0);
+    ADC0->ACTSS = (1<<3) | (1<<2) | (1<<1) | (1<<0);
     
+
+
+
+
+    ADC1->PC = 0x5;//250ksps
+    //Pag 1099 Este registro (ADCSSPRI) configura la prioridad de los secuenciadores
+    //PRIORIDAD ss3/ss2/ss1/ss0  mayor 0-----3 menor 
+    ADC1->SSPRI = 0x3012;
+    //Pag 1077 (ADCACTSS) Este registro controla la activación de los secuenciadores
+    ADC1->ACTSS  =   (0<<3) | (0<<2) | (0<<1) | (0<<0);
+    //Pag 1091 Este registro (ADCEMUX) selecciona el evento que activa la conversión (trigger)
+    ADC1->EMUX  = (0x0<<8)|(0x0<<4);
+    //Pag 1129 Este registro (ADCSSMUX2) define las entradas analógicas con el canal y secuenciador seleccionado
+    
+    
+    
+    ADC1->SSMUX2 = (4<<0); 
+                           //pag 868 Este registro (ADCSSCTL2), configura el bit de control de muestreo y la interrupción
+    ADC1->SSMUX1 = (9<<0); 
+    ADC1->SSCTL2 = (1<<1) | (1<<2);
+    ADC1->SSCTL1 = (1<<1) | (1<<2);
+    /* Enable ADC Interrupt */
+    ADC1->IM = (1<<2)|(1<<1); /* Unmask ADC0 sequence 2 interrupt pag 1082*/
+    //NVIC->PRI4 = (NVICPRI4_R & 0xFFFFFF00) | 0x00000020;
+    //NVIC->EN0 = 0x00010000;
+    //Pag 1077 (ADCACTSS) Este registro controla la activación de los secuenciadores
+    ADC1->ACTSS = (0<<3) | (1<<2) | (1<<1) | (0<<0);
 }
 

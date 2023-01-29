@@ -6,7 +6,7 @@ extern void interrupcion(void);
 extern void transmisor(char *string);
 extern void trans_char(char c);
 extern void UARTS_ISR(void);
-
+extern void delayms(int i);
 
 
 
